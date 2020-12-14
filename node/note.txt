@@ -1,0 +1,72 @@
+select
+MIN(date_tmp.record_time) am,MAX(date_tmp.record_time) pm,date_tmp.user_id,date_tmp.date from (
+-- 创建以日期为基准的临时表，用于获取日期分组
+SELECT hgd_record.record_time::date date,hgd_record.user_id,hgd_record.record_time
+from hgd_record
+) date_tmp
+GROUP BY date_tmp.user_id,date_tmp.date
+ORDER BY date_tmp.date
+;
+
+select raw.am,raw.pm,raw.user_id,raw.date,
+am_start.am_start,
+am_end.am_end,
+
+CASE WHEN raw.am BETWEEN to_timestamp(am_start.am_start, 'YYYY-MM-DD HH:MI:SS') and to_timestamp(am_end.am_end, 'YYYY-MM-DD HH:MI:SS') THEN 1 ELSE 0 END as validate
+
+
+from (
+select
+MIN(date_tmp.record_time) am,MAX(date_tmp.record_time) pm,date_tmp.user_id,date_tmp.date from (
+-- 创建以日期为基准的临时表，用于获取日期分组
+SELECT hgd_record.record_time::date date,hgd_record.user_id,hgd_record.record_time
+from hgd_record
+) date_tmp
+GROUP BY date_tmp.user_id,date_tmp.date
+) raw
+INNER JOIN (
+SELECT
+DISTINCT concat(cast(hgd_record.record_time::date AS VARCHAR), ' ',hgd_record_config.am_start) am_start,
+hgd_record.record_time::date date
+from hgd_record
+left join hgd_record_config on 1=1
+) am_start on am_start.date = raw.date
+INNER JOIN (
+SELECT
+DISTINCT concat(cast(hgd_record.record_time::date AS VARCHAR), ' ',hgd_record_config.am_end) am_end,
+hgd_record.record_time::date date
+from hgd_record
+left join hgd_record_config on 1=1
+) am_end on am_end.date = raw.date
+;
+
+SELECT cast(hgd_record.record_time AS VARCHAR) from hgd_record
+-- INSERT INTO "public"."hgd_record"("record_time", "user_id", "delete_flag", "record_type") VALUES ('2020-11-01 13:29:09', 1, '0', '0');
+
+SELECT
+DISTINCT concat(cast(hgd_record.record_time::date AS VARCHAR), ' ',hgd_record_config.am_start) am_start,
+hgd_record.record_time::date date
+from hgd_record
+left join hgd_record_config on 1=1
+;
+
+SELECT
+DISTINCT concat(cast(hgd_record.record_time::date AS VARCHAR), ' ',hgd_record_config.am_end) am_end,
+hgd_record.record_time::date date
+from hgd_record
+left join hgd_record_config on 1=1
+;
+
+SELECT
+DISTINCT concat(cast(hgd_record.record_time::date AS VARCHAR), ' ',hgd_record_config.pm_start) pm_start,
+hgd_record.record_time::date date
+from hgd_record
+left join hgd_record_config on 1=1
+;
+
+SELECT
+DISTINCT concat(cast(hgd_record.record_time::date AS VARCHAR), ' ',hgd_record_config.pm_end) pm_end,
+hgd_record.record_time::date date
+from hgd_record
+left join hgd_record_config on 1=1
+;

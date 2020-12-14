@@ -6,10 +6,10 @@ spring:
     name: attendance
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://47.105.171.134:5432/attendance
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: root
+    password: postgres
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
 

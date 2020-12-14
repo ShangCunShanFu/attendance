@@ -53,11 +53,7 @@
         <level value="info"/>
         <appender-ref ref="console"/>
     </root>
-    <logger name="com.navinfo.rainbow.ai" level="debug">
-        <appender-ref ref="info_file"/>
-        <appender-ref ref="error_file"/>
-    </logger>
-    <logger name="com.navinfo.rainbow.common" level="debug">
+    <logger name="cn.hgd11.attendance" level="debug">
         <appender-ref ref="info_file"/>
         <appender-ref ref="error_file"/>
     </logger>

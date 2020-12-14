@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hgd11.attendance.mapper.HgdUserMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hgd11.attendance.model.HgdUser" id="hgdUserMap">
+        <result property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="displayName" column="display_name"/>
+        <result property="crtTime" column="crt_time"/>
+        <result property="updTime" column="upd_time"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+</mapper>
