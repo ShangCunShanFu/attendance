@@ -1,0 +1,53 @@
+logging:
+  config: classpath:logback-boot.xml
+
+spring:
+  application:
+    name: attendance
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: root
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    druid:
+      filters: stat
+      maxActive: 20
+      initialSize: 7
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+
+server:
+  port: 8512
+  tomcat:
+    # 最大连接数
+    # 每一次HTTP请求到达Web服务器，Web服务器都会创建一个线程来处理该请求，
+    # 该参数决定了应用服务同时可以处理多少个HTTP请求，tomcat默认为200；
+    max-threads: 2
+    # 最大线程数
+    # 当调用Web服务的HTTP请求数达到tomcat的最大线程数时，还有新的HTTP请求到来，
+    # 这个参数是指在同一时间，tomcat能够接受的最大连接数。一般这个值要大于maxThreads+acceptCount。
+    max-connections: 5
+    # 这时tomcat会将该请求放在等待队列中，这个acceptCount就是指能够接受的最大等待数，默认100.
+    # 如果等待队列也被放满了，这个时候再来新的请求就会被tomcat拒绝（connection refused）；
+    accept-count: 3
+
+mybatis:
+  mapper-locations:
+    - "classpath*:mapper/*.xml"
+  # 当数据库insert操作有需求主健自键时，指定实体类所在的包
+  entity-package: cn.hgd11.attendance.model
+
+mapper:
+  mappers: cn.hgd11.tk.mybatis.mapper.CommonMapper
