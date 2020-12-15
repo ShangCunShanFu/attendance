@@ -48,6 +48,9 @@ mybatis:
     - "classpath*:mapper/*.xml"
   # 当数据库insert操作有需求主健自键时，指定实体类所在的包
   entity-package: cn.hgd11.attendance.model
+  # 开启驼峰与下划线自动匹配
+  configuration:
+    map-underscore-to-camel-case: true
 
 mapper:
   mappers: cn.hgd11.tk.mybatis.mapper.CommonMapper

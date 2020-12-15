@@ -32,13 +32,16 @@ public interface HgdRecordMapper extends CommonMapper<HgdRecord> {
      * @param endTime   查询结束时间  精确到天
      * @param userId    用户ID
      * @param recordType
+     * @param compareStart
+     * @param compareEnd
      * @return 查询打卡记录
      */
     @Nullable
     List<HgdRecordVo> recordList(
-        @NotNull @Param("startTime") Date startTime,
-        @NotNull @Param("endTime") Date endTime,
-        @Nullable @Param("userId") Integer userId,
-        @Nullable @Param("recordType") String recordType
-    );
+            @NotNull @Param("startTime") Date startTime,
+            @NotNull @Param("endTime") Date endTime,
+            @Nullable @Param("userId") Integer userId,
+            @Nullable @Param("recordType") String recordType,
+            @NotNull @Param("compareStart") String compareStart,
+            @NotNull @Param("compareEnd") String compareEnd);
 }

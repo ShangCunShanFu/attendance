@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hgd11.attendance.mapper.HgdRecordConfigMapper">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hgd11.attendance.model.HgdRecordConfig" id="hgdRecordConfigMap">
+        <result property="id" column="id"/>
+        <result property="amStart" column="am_start"/>
+        <result property="amEnd" column="am_end"/>
+        <result property="pmStart" column="pm_start"/>
+        <result property="pmEnd" column="pm_end"/>
+        <result property="crtTime" column="crt_time"/>
+        <result property="updTime" column="upd_time"/>
+        <result property="deleteFlag" column="delete_flag"/>
+    </resultMap>
+
+</mapper>

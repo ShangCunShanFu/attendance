@@ -21,7 +21,7 @@
     </insert>
 
     <!-- 查询打卡记录 -->
-    <select id="recordList" parameterType="cn.hgd11.attendance.vo.HgdRecordVo">
+    <select id="recordList" resultType="cn.hgd11.attendance.vo.HgdRecordVo">
         select
         hgd_user.id,
         hgd_user.username ,
@@ -43,7 +43,7 @@
          user2    2020-12-03
          -->
         select
-        to_char(generate_series(#{startTime}, #{endTime}, '1 day'), 'yyyy-mm-dd') as date ) date_list on
+        to_char(generate_series(to_date('${compareStart}', 'yyyy-mm-dd'), to_date('${compareEnd}', 'yyyy-mm-dd'), '1 day'), 'yyyy-mm-dd') as date ) date_list on
         1 = 1
         left join (
         <!-- 3 该层建立在下一层的基础之上，在统计出入卡与出卡时间后，将入卡时间、出卡时间与规定的有效时间范围进行对比，用于判断打卡记录是否异常 -->
