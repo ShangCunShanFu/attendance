@@ -94,11 +94,21 @@ public class HgdRecordService extends BusinessBiz<HgdRecordMapper, HgdRecord> {
      * 查询打卡记录
      * @param recordType
      * @param userId
+     * @param endTime
+     * @param startTime
      * @return
      */
     @NotNull
-    public ObjectResultResponse<Void> getRecord(@Nullable String recordType, @Nullable Integer userId) {
-
-
+    public ObjectResultResponse<Void> getRecord(
+        @Nullable String recordType,
+        @Nullable Integer userId,
+        @NotNull Date endTime,
+        @NotNull Date startTime
+    ) {
+        String parttern = "yyyy-MM-dd";
+        // 将日期格式化到日期
+        startTime = DateUtils.Lang3DateUtils.parseDate(DateUtils.DateFormatUtils.format(startTime, parttern),
+                                                       parttern)
+        this.mapper.recordList(startTime, endTime, userId, recordType);
     }
 }

@@ -19,4 +19,94 @@
             (#{item.recordTime}, #{item.userId}, #{item.recordType})
         </foreach>
     </insert>
+
+    <!-- 查询打卡记录 -->
+    <select id="recordList" parameterType="cn.hgd11.attendance.vo.HgdRecordVo">
+        select
+        hgd_user.id,
+        hgd_user.username ,
+        hgd_user.display_name,
+        date_list.date,
+        max_min_record_join.record_in,
+        max_min_record_join.record_out,
+        max_min_record_join.invalidate_am,
+        max_min_record_join.invalidate_pm
+        from
+        hgd_user
+        inner join (
+        <!-- 4 该层会生成一个查询开始时间到结束时间之间的日期列表，用于与用户表进行关联，从而联合出每一个用户在某一时间区间的记录列表。生成后的列表如下：
+         user1    2020-12-01
+         user2    2020-12-01
+         user1    2020-12-02
+         user2    2020-12-02
+         user1    2020-12-03
+         user2    2020-12-03
+         -->
+        select
+        to_char(generate_series(#{startTime}, #{endTime}, '1 day'), 'yyyy-mm-dd') as date ) date_list on
+        1 = 1
+        left join (
+        <!-- 3 该层建立在下一层的基础之上，在统计出入卡与出卡时间后，将入卡时间、出卡时间与规定的有效时间范围进行对比，用于判断打卡记录是否异常 -->
+        select invalidate_tmp.date, invalidate_tmp.user_id,invalidate_tmp.record_in,invalidate_tmp.record_out,
+        case when
+        (invalidate_tmp.record_in &lt; to_timestamp(concat(cast(invalidate_tmp.date as VARCHAR) , ' ', hgd_record_config.am_start ), 'YYYY-MM-DD HH24:MI:SS')
+        or invalidate_tmp.record_in &gt; to_timestamp(concat(cast(invalidate_tmp.date as VARCHAR) , ' ', hgd_record_config.am_end ), 'YYYY-MM-DD HH24:MI:SS'))
+        then 1 else 0 end invalidate_am,
+        case when invalidate_tmp.record_out &lt; to_timestamp(concat(cast(invalidate_tmp.date as VARCHAR) , ' ', hgd_record_config.pm_start ), 'YYYY-MM-DD HH24:MI:SS')
+        then 1 else 0 end invalidate_pm
+        from (
+        <!-- 该层统计出打卡时早上入卡时间与晚上出卡时间 -->
+        select
+        max_min_record.date, max_min_record.user_id, min(max_min_record.record_time) record_in, max(max_min_record.record_time) record_out
+        from
+        (
+        <!-- 2 该层为辅助层，也可没有 -->
+        select
+        base_list.compare_am_start, base_list.compare_pm_end, base_list.user_id, base_list.id, base_list.record_time, base_list.date
+        from
+        (
+        <!-- 1 这一层用户将打卡表中记录提取出来，并创建三个辅助列
+        compare_am_start  用于对比打卡时间是否早于早上打卡
+        compare_pm_end    用于对比打卡时间是否晚于晚上打卡
+        date              用于记录上期，并会作为join条件
+        -->
+        select
+        to_timestamp(concat(cast(hgd_record.record_time::date as VARCHAR) , ' ', hgd_record_config.am_start ), 'YYYY-MM-DD HH24:MI:SS') compare_am_start,
+        to_timestamp(concat(cast(hgd_record.record_time::date as VARCHAR) , ' ', hgd_record_config.pm_end ), 'YYYY-MM-DD HH24:mi:SS') compare_pm_end,
+        hgd_record.user_id , hgd_record.id, hgd_record.record_time,
+        hgd_record.record_time::time time_str,
+        hgd_record_config.am_start,
+        hgd_record.record_time::date date
+        from
+        hgd_record
+        inner join hgd_record_config on
+        1 = 1
+        where
+        hgd_record.delete_flag = '0'
+        <!-- 考勤查询范围 -->
+        and hgd_record.record_time between #{startTime} and #{endTime}
+        <if test="userId != null">
+            and hgd_record.user_id  = #{userId}
+        </if>
+        <if test="recordType != null and recordType != ''">
+            and hgd_record.record_type  = #{recordType}
+        </if>
+        ) base_list
+        where
+        base_list.record_time between base_list.compare_am_start and base_list.compare_pm_end ) max_min_record
+        group by
+        max_min_record.date, max_min_record.user_id
+        ) invalidate_tmp
+        inner join hgd_record_config on 1=1
+        ) max_min_record_join on
+        (max_min_record_join.user_id = hgd_user.id
+        and cast(max_min_record_join.date::date as VARCHAR) = date_list.date)
+        where
+        hgd_user.delete_flag = '0'
+        <if test="userId != null">
+            and hgd_record.user_id  = #{userId}
+        </if>
+        order by
+        date_list.date desc,convert_to(hgd_user.display_name, 'GBK') asc
+    </select>
 </mapper>

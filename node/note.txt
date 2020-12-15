@@ -1,4 +1,77 @@
 select
+	hgd_user.id,
+	hgd_user.username ,
+	date_list.date,
+	max_min_record_join.record_in,
+	max_min_record_join.record_out
+from
+	hgd_user
+inner join (
+	select
+		to_char(generate_series(to_date('2020-11-01', 'yyyy-mm-dd'), to_date('2020-11-30', 'yyyy-mm-dd'), '1 day'), 'yyyy-mm-dd') as date ) date_list on
+	1 = 1
+left join (
+
+
+
+	select invalidate_tmp.date, invalidate_tmp.user_id,invalidate_tmp.record_in,invalidate_tmp.record_out,
+	case when
+	(invalidate_tmp.record_in < to_timestamp(concat(cast(invalidate_tmp.date as VARCHAR) , ' ', hgd_record_config.am_start ), 'YYYY-MM-DD HH24:MI:SS')
+	or invalidate_tmp.record_in > to_timestamp(concat(cast(invalidate_tmp.date as VARCHAR) , ' ', hgd_record_config.am_end ), 'YYYY-MM-DD HH24:MI:SS'))
+	then 1 else 0 end invalidate_am,
+	case when invalidate_tmp.record_out < to_timestamp(concat(cast(invalidate_tmp.date as VARCHAR) , ' ', hgd_record_config.pm_start ), 'YYYY-MM-DD HH24:MI:SS')
+	then 1 else 0 end invalidate_pm
+	from (
+		select
+				max_min_record.date, max_min_record.user_id, min(max_min_record.record_time) record_in, max(max_min_record.record_time) record_out
+			from
+				(
+				select
+					base_list.compare_am_start, base_list.compare_pm_end, base_list.user_id, base_list.id, base_list.record_time, base_list.date
+				from
+					(
+					select
+						to_timestamp(concat(cast(hgd_record.record_time::date as VARCHAR) , ' ', hgd_record_config.am_start ), 'YYYY-MM-DD HH24:MI:SS') compare_am_start,
+						to_timestamp(concat(cast(hgd_record.record_time::date as VARCHAR) , ' ', hgd_record_config.pm_end ), 'YYYY-MM-DD HH24:mi:SS') compare_pm_end,
+						hgd_record.user_id , hgd_record.id, hgd_record.record_time,
+						hgd_record.record_time::time time_str,
+						hgd_record_config.am_start,
+						hgd_record.record_time::date date
+					from
+						hgd_record
+					inner join hgd_record_config on
+						1 = 1
+					where
+						hgd_record.delete_flag = '0'
+						-- 考勤查询范围 ---
+						and hgd_record.record_time between '2020-11-01 00:00:00' and '2020-11-30 23:59:59' ) base_list
+				where
+					base_list.record_time between base_list.compare_am_start and base_list.compare_pm_end ) max_min_record
+			group by
+				max_min_record.date, max_min_record.user_id
+	) invalidate_tmp
+	inner join hgd_record_config on 1=1
+
+
+
+
+
+
+
+
+
+
+		) max_min_record_join on
+	(max_min_record_join.user_id = hgd_user.id
+	and cast(max_min_record_join.date::date as VARCHAR) = date_list.date)
+where
+	hgd_user.delete_flag = '0' ;
+
+
+-- ----------------------------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------------------------------
+select
 MIN(date_tmp.record_time) am,MAX(date_tmp.record_time) pm,date_tmp.user_id,date_tmp.date from (
 -- 创建以日期为基准的临时表，用于获取日期分组
 SELECT hgd_record.record_time::date date,hgd_record.user_id,hgd_record.record_time
@@ -10,11 +83,7 @@ ORDER BY date_tmp.date
 
 select raw.am,raw.pm,raw.user_id,raw.date,
 am_start.am_start,
-am_end.am_end,
-
-CASE WHEN raw.am BETWEEN to_timestamp(am_start.am_start, 'YYYY-MM-DD HH:MI:SS') and to_timestamp(am_end.am_end, 'YYYY-MM-DD HH:MI:SS') THEN 1 ELSE 0 END as validate
-
-
+am_end.am_end
 from (
 select
 MIN(date_tmp.record_time) am,MAX(date_tmp.record_time) pm,date_tmp.user_id,date_tmp.date from (
@@ -70,3 +139,46 @@ hgd_record.record_time::date date
 from hgd_record
 left join hgd_record_config on 1=1
 ;
+
+select hgd_user.id,hgd_user.username , date_list.date
+from hgd_user
+inner join (
+SELECT to_char(generate_series(to_date('2020-11-01','yyyy-mm-dd'), to_date('2020-11-30','yyyy-mm-dd'), '1 day'),'yyyy-mm-dd') as date
+) date_list on 1=1
+where hgd_user.delete_flag = '0'
+;
+
+
+-- 查询在有效打卡时间范围内的打卡记录
+select
+base_list.compare_am_start,
+base_list.compare_pm_end,
+base_list.user_id,
+base_list.id,
+base_list.record_time,
+base_list.time_str,
+base_list.am_start
+from (
+select
+	to_timestamp(concat(cast(hgd_record.record_time::date as VARCHAR) , ' ', hgd_record_config.am_start ), 'YYYY-MM-DD HH24:MI:SS') compare_am_start,
+	to_timestamp(concat(cast(hgd_record.record_time::date as VARCHAR) , ' ', hgd_record_config.pm_end ), 'YYYY-MM-DD HH24:mi:SS') compare_pm_end,
+	hgd_record.user_id ,
+	hgd_record.id,
+	hgd_record.record_time,
+	hgd_record.record_time::time time_str,
+	hgd_record_config.am_start
+from
+	hgd_record
+inner join hgd_record_config on
+	1 = 1
+where
+	hgd_record.delete_flag = '0'
+	-- 考勤查询范围 ---
+and hgd_record.record_time between '2020-11-01 00:00:00' and '2020-11-09 17:32:22'
+) base_list
+where base_list.record_time between base_list.compare_am_start and base_list.compare_pm_end;
+
+select hrc.am_start,hrc.pm_end
+from hgd_record_config hrc;
+
+SELECT to_char(generate_series(to_date('2020-01-01','yyyy-mm-dd'), to_date('2020-11-01','yyyy-mm-dd'), '1 day'),'yyyy-mm-dd') as time;

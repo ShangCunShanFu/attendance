@@ -46,6 +46,6 @@ public class HgdRecordController extends BaseController<HgdRecordService, HgdRec
             @RequestParam(value = "userId", required = false) @ApiParam("用户ID") Integer userId)
             throws ParseException {
         log.info("随机添加打卡记录");
-        return this.baseBiz.getRecord(recordType, userId);
+        return this.baseBiz.getRecord(recordType, userId, endTime, startTime);
     }
 }
