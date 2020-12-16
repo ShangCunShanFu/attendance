@@ -29,25 +29,14 @@ public class HgdRecordConfigService extends BusinessBiz<HgdRecordConfigMapper, H
          *      提供的方法，BeanUtils采用代理模式，其性能不及setter方法
          */
         Example example = new Example(HgdRecordConfig.class);
-        example.createCriteria().andEqualTo("delete_flag", BooleanUtils.FALSE);
+        example.createCriteria().andEqualTo("deleteFlag", BooleanUtils.FALSE);
         Optional<HgdRecordConfig> configedOptional = Optional.ofNullable(this.mapper.selectOneByExample(example));
         if (configedOptional.isPresent()) {
             // 进行更新操作
             HgdRecordConfig configed = configedOptional.get();
-            if (hgdRecordConfig.getAmEnd() != null) {
-                configed.setAmEnd(hgdRecordConfig.getAmEnd());
-            }
-            if (hgdRecordConfig.getAmStart() != null) {
-                configed.setAmStart(hgdRecordConfig.getAmStart());
-            }
-            if (hgdRecordConfig.getPmEnd() != null) {
-                configed.setPmEnd(hgdRecordConfig.getPmEnd());
-            }
-            if (hgdRecordConfig.getPmStart() != null) {
-                configed.setPmStart(hgdRecordConfig.getPmStart());
-            }
+            hgdRecordConfig.setId(configed.getId());
             configed.setUpdTime(new Date());
-            this.mapper.updateByPrimaryKeySelective(configed);
+            this.mapper.updateByPrimaryKeySelective(hgdRecordConfig);
             hgdRecordConfig.setId(configed.getId());
         } else {
             // 进行新增操作

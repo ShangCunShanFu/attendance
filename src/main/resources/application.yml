@@ -27,9 +27,15 @@ spring:
       testOnReturn: false
       poolPreparedStatements: true
       maxOpenPreparedStatements: 20
+  # 配置日期类型序列化为东8时区 格式为yyyy-MM-dd HH:mm:ss
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
 
 server:
   port: 8512
+  servlet:
+    context-path: /attendance/api/v1
   tomcat:
     # 最大连接数
     # 每一次HTTP请求到达Web服务器，Web服务器都会创建一个线程来处理该请求，
@@ -54,3 +60,9 @@ mybatis:
 
 mapper:
   mappers: cn.hgd11.tk.mybatis.mapper.CommonMapper
+
+#springfox:
+#  documentation:
+#    swagger:
+#      v2:
+#        host: hgd11.cn

@@ -9,6 +9,7 @@ import cn.hgd11.attendance.model.HgdRecord;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.constraints.NotNull;
 import java.text.ParseException;
@@ -27,6 +28,7 @@ public class HgdRecordController extends BaseController<HgdRecordService, HgdRec
 
     @PostMapping("random/record")
     @ApiOperation("随机添加打卡记录")
+    @ApiIgnore
     public ObjectResultResponse<Void> addRandomRecord()
             throws ParseException {
         log.info("随机添加打卡记录");
@@ -36,7 +38,7 @@ public class HgdRecordController extends BaseController<HgdRecordService, HgdRec
     @PostMapping("record")
     @ApiOperation("进行打卡")
     public ObjectResultResponse<Void> addRecord(
-            @RequestParam(value = "recordType") @ApiParam(value = "打卡类型(0:上班打卡|1:外出打卡|2:补卡)") String recordType,
+            @RequestParam(value = "recordType") @ApiParam(value = "打卡类型(0:上班打卡|1:外出打卡|2:补卡)", example = "0") String recordType,
             @RequestParam(value = "userId") @ApiParam(value = "用户ID", example = "1") Integer userId)
             throws ParseException {
         log.info("进行打卡,当前用户ID:{}", userId);
@@ -48,8 +50,8 @@ public class HgdRecordController extends BaseController<HgdRecordService, HgdRec
     public @NotNull TableResultResponse<HgdRecordVo> getRecord(
             @RequestParam(value = "recordType", defaultValue = "") @ApiParam(value = "打卡类型(0:上班打卡|1:外出打卡|2:补卡)") String recordType,
             @RequestParam(value = "userId", required = false) @ApiParam(value = "用户ID", example = "1") Integer userId,
-            @RequestParam(value = "endTime") @ApiParam("查询结束时间,格式为yyyy/MM/dd") Date endTime,
-            @RequestParam("startTime") @ApiParam("查询开始时间,格式为yyyy/MM/dd") Date startTime,
+            @RequestParam(value = "endTime") @ApiParam(value = "查询结束时间,格式为yyyy/MM/dd", example = "2020/11/30") Date endTime,
+            @RequestParam("startTime") @ApiParam(value = "查询开始时间,格式为yyyy/MM/dd", example = "2020/11/01") Date startTime,
             @RequestParam(value = "pageNum", defaultValue = "1") @ApiParam(value = "当前页,默认为1", example = "1") int pageNum,
             @RequestParam(value = "pageSize", defaultValue = "10") @ApiParam(value = "页容量，默认为10", example = "10") int pageSize)
             throws ParseException {

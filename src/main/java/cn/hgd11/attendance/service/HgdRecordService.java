@@ -91,7 +91,7 @@ public class HgdRecordService extends BusinessBiz<HgdRecordMapper, HgdRecord> {
         record.setUserId(userId);
         record.setRecordType(recordType);
         this.mapper.insertSelective(record);
-        return new ObjectResultResponse<>(0, "添加成功");
+        return new ObjectResultResponse<>(0, "打卡成功");
     }
 
     /**
