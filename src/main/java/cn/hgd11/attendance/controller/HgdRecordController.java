@@ -28,7 +28,6 @@ public class HgdRecordController extends BaseController<HgdRecordService, HgdRec
 
     @PostMapping("random/record")
     @ApiOperation("随机添加打卡记录")
-    @ApiIgnore
     public ObjectResultResponse<Void> addRandomRecord()
             throws ParseException {
         log.info("随机添加打卡记录");
