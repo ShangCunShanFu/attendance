@@ -61,8 +61,8 @@ mybatis:
 mapper:
   mappers: cn.hgd11.tk.mybatis.mapper.CommonMapper
 
-#springfox:
-#  documentation:
-#    swagger:
-#      v2:
-#        host: hgd11.cn
+springfox:
+  documentation:
+    swagger:
+      v2:
+        host: hgd11.cn
