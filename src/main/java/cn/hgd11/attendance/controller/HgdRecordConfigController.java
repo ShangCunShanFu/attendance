@@ -20,11 +20,18 @@ import java.text.ParseException;
 @Api(tags = "有效打卡时间配置")
 public class HgdRecordConfigController extends BaseController<HgdRecordConfigService,HgdRecordConfig,Integer> {
     @PutMapping
-    @ApiOperation("随机添加打卡记录")
+    @ApiOperation("配置有效打卡时间范围")
     public ObjectResultResponse<HgdRecordConfig> recordConfig(
             @RequestBody @Validated HgdRecordConfig hgdRecordConfig,
             BindingResult bindingResult) {
-        log.info("随机添加打卡记录");
+        log.info("配置有效打卡时间范围");
         return this.baseBiz.recordConfig(hgdRecordConfig);
+    }
+
+    @GetMapping
+    @ApiOperation("查询当前有效打卡时间范围")
+    public ObjectResultResponse<HgdRecordConfig> getRecordConfig() {
+        log.info("查询当前有效打卡时间范围");
+        return this.baseBiz.getRecordConfig();
     }
 }

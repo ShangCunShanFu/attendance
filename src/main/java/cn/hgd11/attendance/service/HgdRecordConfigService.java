@@ -48,4 +48,15 @@ public class HgdRecordConfigService extends BusinessBiz<HgdRecordConfigMapper, H
 
         return new ObjectResultResponse<>("更新完成", 0, hgdRecordConfig);
     }
+
+    /**
+     * 查询当前有效打卡时间范围
+     * @return
+     */
+    public ObjectResultResponse<HgdRecordConfig> getRecordConfig() {
+        Example example = new Example(HgdRecordConfig.class);
+        example.createCriteria().andEqualTo("deleteFlag", BooleanUtils.FALSE);
+        Optional<HgdRecordConfig> configedOptional = Optional.ofNullable(this.mapper.selectOneByExample(example));
+        return new ObjectResultResponse<>("查询成功", configedOptional.orElse(new HgdRecordConfig()));
+    }
 }
