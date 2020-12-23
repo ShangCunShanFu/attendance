@@ -4,7 +4,8 @@ logging:
 spring:
   application:
     name: attendance
-
+  profiles:
+    active: dev
   datasource:
     url: jdbc:postgresql://47.105.171.134:5432/attendance
     driver-class-name: org.postgresql.Driver
@@ -31,6 +32,14 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
+  activiti:
+    # 自动部署验证设置:true-开启（默认）、false-关闭
+    check-process-definitions: false
+    #自动部署文件路径后缀
+  #   process-definition-location-prefix: classpath:/processes/
+  #   process-definition-location-suffixes:
+  #      - **.bpmn
+  #      - **.bpmn20.xml
 
 server:
   port: 8512
@@ -60,9 +69,3 @@ mybatis:
 
 mapper:
   mappers: cn.hgd11.tk.mybatis.mapper.CommonMapper
-
-springfox:
-  documentation:
-    swagger:
-      v2:
-        host: hgd11.cn
